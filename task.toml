@@ -1,0 +1,7 @@
+[task]
+codebase_size = "small"
+difficulty = "The task requires multi-step reasoning: understanding how to mock/use offline WandB, training a model, saving histogram state, and calculating PSI in a separate web process."
+
+[metadata]
+title = "Implement WandB Offline Drift Monitoring for Django Inference"
+tags = ["Machine Learning & AI", "Tool Specific", "API Integration", "Python", "WandB", "Django"]
