@@ -1,4 +1,5 @@
 [task]
+id = "wandb-offline-drift-django"
 codebase_size = "small"
 difficulty = "The task requires multi-step reasoning: understanding how to mock/use offline WandB, training a model, saving histogram state, and calculating PSI in a separate web process."
 
