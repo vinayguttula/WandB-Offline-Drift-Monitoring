@@ -1,8 +1,5 @@
 version = "2.0"
 
-[task]
-id = "wandb-offline-drift-django"
-
 [metadata]
 author_name = "anonymous"
 author_email = "anonymous"
