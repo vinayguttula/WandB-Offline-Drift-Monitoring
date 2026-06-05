@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Ensure target directories exist using absolute paths exactly as Terminus dictates
-mkdir -p /app/environment/cli
-mkdir -p /app/environment/django_project/api
+# Get exactly where this script is located so we can resolve the root robustly
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+BASE="$DIR/../environment"
+
+# Ensure target directories exist using dynamic paths
+mkdir -p "$BASE/cli"
+mkdir -p "$BASE/django_project/api"
+mkdir -p "$BASE/data"
 
 # Write train script
-cat << 'INNER_EOF' > /app/environment/cli/train.py
+cat << INNER_EOF > "$BASE/cli/train.py"
 import argparse
 import pandas as pd
 import numpy as np
@@ -66,7 +71,7 @@ if __name__ == "__main__":
 INNER_EOF
 
 # Write Django API views
-cat << 'INNER_EOF' > /app/environment/django_project/api/views.py
+cat << INNER_EOF > "$BASE/django_project/api/views.py"
 import json
 import math
 from rest_framework.decorators import api_view
@@ -75,8 +80,8 @@ import joblib
 from pathlib import Path
 import numpy as np
 
-# Strictly /app/environment as per instruction absolute paths
-BASE_DIR = Path("/app/environment")
+# Dynamically resolve root relative to this file
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 MODEL_PATH = BASE_DIR / "model.joblib"
 HIST_PATH = BASE_DIR / "hist.json"
 

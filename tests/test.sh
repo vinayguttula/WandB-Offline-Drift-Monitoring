@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-# Ensure tests are run inside the exact directory pytest.ini expects
-cd /app
+# Get the directory where test.sh is located
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ROOT_DIR="$(dirname "$DIR")"
+
+# Navigate to the root directory
+cd "$ROOT_DIR"
 
 # Install test dependencies offline
 pip install --no-index --find-links=/tmp/test-wheels pytest pytest-django || true
@@ -12,5 +16,5 @@ if ! command -v pytest &> /dev/null; then
     pip install pytest pytest-django
 fi
 
-# We explicitly execute targeting the /app/tests files
-PYTHONPATH=/app/environment/django_project pytest -c /app/tests/pytest.ini -v /app/tests/test_outputs.py
+# We explicitly execute targeting the dynamically resolved tests folder
+PYTHONPATH="$ROOT_DIR/environment/django_project" pytest -c "$DIR/pytest.ini" -v "$DIR/test_outputs.py"

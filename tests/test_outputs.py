@@ -5,8 +5,9 @@ import pytest
 from pathlib import Path
 from django.test import Client
 
-# In Snorkel, the root is always mounted to /app
-ENV_DIR = Path("/app/environment")
+# Dynamically resolve root relative to this file
+BASE_DIR = Path(__file__).resolve().parent.parent
+ENV_DIR = BASE_DIR / "environment"
 
 DATA_PATH = ENV_DIR / "data" / "train.csv"
 MODEL_OUTPUT_PATH = ENV_DIR / "model.joblib"
