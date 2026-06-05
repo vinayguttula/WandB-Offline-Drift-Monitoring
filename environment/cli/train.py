@@ -29,7 +29,6 @@ def main():
     accuracy = accuracy_score(y, preds)
     wandb.log({"accuracy": accuracy})
     
-    cm = confusion_matrix(y, preds)
     wandb.log({"conf_mat": wandb.plot.confusion_matrix(probs=None,
                         y_true=y.to_numpy(), preds=preds,
                         class_names=["0", "1"])})
