@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+mkdir -p /app/environment/cli
+mkdir -p /app/environment/django_project/api
+mkdir -p /app/environment/data
+
 cat << 'INNER_EOF' > /app/environment/cli/train.py
 import argparse
 import pandas as pd
