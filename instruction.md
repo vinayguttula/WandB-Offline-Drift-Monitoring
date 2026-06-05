@@ -1,5 +1,3 @@
-# Implement WandB Offline Drift Monitoring for Django Inference
-
 You must build a machine learning pipeline and inference API that integrates offline model tracking and statistical drift monitoring.
 
 ## System Requirements
@@ -8,7 +6,7 @@ The system consists of two primary components:
 1. A Python CLI for model training.
 2. A Django API for serving predictions and calculating drift.
 
-### Component 1: Python CLI (`cli/train.py`)
+### Component 1: Python CLI (`/app/environment/cli/train.py`)
 You must implement a Python command-line interface that trains a scikit-learn tabular classifier and logs artifacts to Weights & Biases (WandB) in **offline mode**.
 
 **Inputs:**
@@ -26,7 +24,7 @@ The script must accept three positional arguments:
 - Save the trained model to `model_output_path` and log it as a WandB artifact.
 - Compute histograms for each feature in the training data using 10 equal-width bins. Save the bin edges and training set bin counts/frequencies to `hist_output_path` as a JSON file.
 
-### Component 2: Django API (`django_project/api/views.py`)
+### Component 2: Django API (`/app/environment/django_project/api/views.py`)
 You must extend a Django REST Framework API with two endpoints. The application should load the trained model and the saved training histograms at startup.
 
 **Endpoint 1: Predict**
@@ -90,6 +88,3 @@ For a given feature, PSI is calculated across the 10 bins:
 - `Expected_Pct` is the proportion of the training data in each bin (calculated during training).
 - `Actual_Pct` is the proportion of the batch data in each bin (using the training bin edges).
 - Add a small epsilon (`1e-6`) to actual and expected proportions before division and logarithm to avoid division by zero or `ln(0)`.
-
-## Teardown Considerations
-Ensure that any running test servers or WandB background processes are cleanly terminated at the end of your tests to prevent CI runner deadlocks.

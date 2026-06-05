@@ -1,20 +1,18 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-# Get the directory where test.sh is located
+mkdir -p /logs/verifier
+
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ROOT_DIR="$(dirname "$DIR")"
 
-# Navigate to the root directory
 cd "$ROOT_DIR"
 
-# Install test dependencies offline
-pip install --no-index --find-links=/tmp/test-wheels pytest pytest-django || true
+PYTHONPATH="$ROOT_DIR/environment/django_project" python -m pytest -c "$DIR/pytest.ini" -v "$DIR/test_outputs.py" -rA
+rc=$?
 
-# Failsafe if pip fails finding links
-if ! command -v pytest &> /dev/null; then
-    pip install pytest pytest-django
+if [ "$rc" -eq 0 ]; then
+  echo 1 > /logs/verifier/reward.txt
+else
+  echo 0 > /logs/verifier/reward.txt
 fi
-
-# We explicitly execute targeting the dynamically resolved tests folder
-PYTHONPATH="$ROOT_DIR/environment/django_project" pytest -c "$DIR/pytest.ini" -v "$DIR/test_outputs.py"

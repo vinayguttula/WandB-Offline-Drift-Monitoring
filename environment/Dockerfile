@@ -1,12 +1,14 @@
-FROM python:3.11-slim
+FROM python:3.11-slim@sha256:d8943ab07fbbdf4556a31f77d33d526e036e7880998a4a51e6dd2cd0f4a8618d
 
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
+    tmux \
+    asciinema \
     && rm -rf /var/lib/apt/lists/*
 
-# Install core production dependencies
+# Install core production AND verifier dependencies
 RUN pip install --no-cache-dir \
     django==5.0.6 \
     djangorestframework==3.15.1 \
@@ -14,11 +16,7 @@ RUN pip install --no-cache-dir \
     pandas==2.2.2 \
     numpy==1.26.4 \
     wandb==0.17.0 \
-    joblib==1.4.2
-
-# Pre-download test dependencies to a cache directory for offline installation
-RUN mkdir -p /tmp/test-wheels && \
-    pip download -d /tmp/test-wheels \
+    joblib==1.4.2 \
     pytest==8.2.1 \
     pytest-django==4.8.0
 

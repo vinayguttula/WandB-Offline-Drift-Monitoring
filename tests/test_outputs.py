@@ -16,7 +16,7 @@ TRAIN_SCRIPT = ENV_DIR / "cli" / "train.py"
 
 @pytest.fixture(scope="session", autouse=True)
 def run_training():
-    """Run the training CLI before tests."""
+    """Run the training CLI before tests to setup artifact states."""
     env = os.environ.copy()
     env["WANDB_MODE"] = "offline"
     env["WANDB_DIR"] = str(ENV_DIR)
@@ -38,15 +38,18 @@ def run_training():
     subprocess.run(["pkill", "-f", "wandb-service"], check=False)
 
 def test_training_execution(run_training):
+    """Verify that the training CLI executed successfully with zero exit code."""
     assert run_training.returncode == 0, f"Training failed:\n{run_training.stderr}"
 
 def test_wandb_offline_artifacts(run_training):
+    """Verify that WandB successfully created offline run artifacts in the environment directory."""
     wandb_dir = ENV_DIR / "wandb"
     assert wandb_dir.exists(), "WandB directory not found"
     offline_runs = list(wandb_dir.glob("offline-run-*"))
     assert len(offline_runs) > 0, "No offline WandB runs found"
     
 def test_output_files_created(run_training):
+    """Verify that the serialized model and histogram output files are created with correct schemas."""
     assert MODEL_OUTPUT_PATH.exists(), "Model output not found"
     assert HIST_OUTPUT_PATH.exists(), "Histogram output not found"
     
@@ -62,9 +65,11 @@ def test_output_files_created(run_training):
         
 @pytest.fixture
 def api_client():
+    """Setup Django test client fixture."""
     return Client()
 
 def test_predict_endpoint_success(api_client, run_training):
+    """Verify that the /api/predict/ endpoint correctly returns a prediction given valid features."""
     payload = {"features": [0.5, -1.2, 0.3, 0.9]}
     response = api_client.post('/api/predict/', data=json.dumps(payload), content_type='application/json')
     assert response.status_code == 200
@@ -73,6 +78,7 @@ def test_predict_endpoint_success(api_client, run_training):
     assert isinstance(data["prediction"], (int, float))
 
 def test_predict_endpoint_invalid_schema(api_client, run_training):
+    """Verify that the /api/predict/ endpoint rejects malformed input schemas with HTTP 400."""
     response = api_client.post('/api/predict/', data=json.dumps({"wrong": [1,2,3,4]}), content_type='application/json')
     assert response.status_code == 400
     assert response.json() == {"error": "Invalid input schema"}
@@ -82,6 +88,7 @@ def test_predict_endpoint_invalid_schema(api_client, run_training):
     assert response.json() == {"error": "Invalid input schema"}
     
 def test_drift_endpoint_success(api_client, run_training):
+    """Verify that the /api/drift/ endpoint successfully calculates Population Stability Index (PSI) drift."""
     batch = [
         {"features": [3.5, -1.2, 0.3, 0.9]},
         {"features": [3.6, -1.0, 0.2, 0.8]},
@@ -102,6 +109,7 @@ def test_drift_endpoint_success(api_client, run_training):
     assert data["is_drifted"] is True
 
 def test_drift_endpoint_invalid_schema(api_client, run_training):
+    """Verify that the /api/drift/ endpoint safely handles invalid schema formats with HTTP 400."""
     response = api_client.post('/api/drift/', data=json.dumps({"wrong": []}), content_type='application/json')
     assert response.status_code == 400
     assert response.json() == {"error": "Invalid input schema"}
