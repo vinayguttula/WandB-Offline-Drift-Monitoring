@@ -3,12 +3,8 @@ set -uo pipefail
 
 mkdir -p /logs/verifier
 
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-ROOT_DIR="$(dirname "$DIR")"
-
-cd "$ROOT_DIR"
-
-PYTHONPATH="$ROOT_DIR/environment/django_project" python -m pytest -c "$DIR/pytest.ini" -v "$DIR/test_outputs.py" -rA
+# The Snorkel evaluation container strictly mounts the tests suite to /tests/
+PYTHONPATH="/app/environment/django_project" python -m pytest -c /tests/pytest.ini -v /tests/test_outputs.py -rA
 rc=$?
 
 if [ "$rc" -eq 0 ]; then

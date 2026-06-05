@@ -20,5 +20,5 @@ RUN pip install --no-cache-dir \
     pytest==8.2.1 \
     pytest-django==4.8.0
 
-# Copy application files (to be mounted or copied in the runner)
-COPY . /app/
+# Copy application environment files
+COPY . /app/environment/
