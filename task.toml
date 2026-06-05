@@ -4,12 +4,12 @@ version = "2.0"
 author_name = "anonymous"
 author_email = "anonymous"
 difficulty = "hard"
-category = "machine_learning"
-subcategories = ["api_integration", "tool_specific"]
+category = "security"
+subcategories = ["api_integration", "ui_building"]
 number_of_milestones = 0
 codebase_size = "small"
-languages = ["python", "bash"]
-tags = ["wandb", "django", "scikit-learn", "python"]
+languages = ["python", "javascript", "bash"]
+tags = ["flask", "react", "totp", "mfa", "playwright"]
 expert_time_estimate_min = 60
 junior_time_estimate_min = 120
 
@@ -25,6 +25,3 @@ cpus = 2
 memory_mb = 4096
 storage_mb = 10240
 allow_internet = false
-
-[[tasks]]
-id = "wandb-offline-drift-django"

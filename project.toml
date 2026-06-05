@@ -1,0 +1,6 @@
+version = "2.0"
+
+[metadata]
+title = "Implement WandB Offline Drift Monitoring for Django Inference"
+
+tasks = ["."]
