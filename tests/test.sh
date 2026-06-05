@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-# Ensure we are in the correct directory for absolute paths
-cd /app
+if [ -d "/app/environment" ]; then
+    cd /app/environment
+elif [ -d "/app" ]; then
+    cd /app
+fi
 
-# Install test dependencies offline
-pip install --no-index --find-links=/tmp/test-wheels pytest pytest-django
+pip install --no-index --find-links=/tmp/test-wheels pytest pytest-django || true
+if ! command -v pytest &> /dev/null; then
+    pip install pytest pytest-django
+fi
 
-# Run the test suite with pytest
-# Explicitly add django_project to PYTHONPATH so settings are found
-PYTHONPATH=/app/environment/django_project pytest -v tests/test_outputs.py
+PYTHONPATH=$(pwd)/django_project pytest -v tests/test_outputs.py || \
+PYTHONPATH=/app/environment/django_project pytest -v /app/tests/test_outputs.py || \
+PYTHONPATH=$(pwd)/environment/django_project pytest -v tests/test_outputs.py
