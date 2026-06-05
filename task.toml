@@ -1,15 +1,18 @@
 version = "2.0"
 
+[task]
+id = "wandb-offline-drift-django"
+
 [metadata]
 author_name = "anonymous"
 author_email = "anonymous"
 difficulty = "hard"
-category = "security"
-subcategories = ["api_integration", "ui_building"]
+category = "machine_learning"
+subcategories = ["api_integration", "tool_specific"]
 number_of_milestones = 0
 codebase_size = "small"
-languages = ["python", "javascript", "bash"]
-tags = ["flask", "react", "totp", "mfa", "playwright"]
+languages = ["python", "bash"]
+tags = ["wandb", "django", "scikit-learn", "python"]
 expert_time_estimate_min = 60
 junior_time_estimate_min = 120
 
