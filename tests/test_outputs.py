@@ -5,15 +5,8 @@ import pytest
 from pathlib import Path
 from django.test import Client
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Resolve flexible path configurations based on the Terminus execution mount
-if (BASE_DIR / "environment" / "cli" / "train.py").exists():
-    ENV_DIR = BASE_DIR / "environment"
-elif (Path("/app/environment/cli/train.py").exists()):
-    ENV_DIR = Path("/app/environment")
-else:
-    ENV_DIR = BASE_DIR
+# In Snorkel, the root is always mounted to /app
+ENV_DIR = Path("/app/environment")
 
 DATA_PATH = ENV_DIR / "data" / "train.csv"
 MODEL_OUTPUT_PATH = ENV_DIR / "model.joblib"

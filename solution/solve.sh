@@ -1,22 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_BASE="$(find /app /workspace -maxdepth 2 -type d -name "django_project" 2>/dev/null | head -n 1 || true)"
-if [ -z "$APP_BASE" ]; then
-    if [ -d "/app/environment" ]; then
-        BASE="/app/environment"
-    else
-        BASE="/app"
-    fi
-else
-    BASE="$(dirname "$APP_BASE")"
-fi
+# Ensure target directories exist using absolute paths exactly as Terminus dictates
+mkdir -p /app/environment/cli
+mkdir -p /app/environment/django_project/api
 
-mkdir -p "$BASE/cli"
-mkdir -p "$BASE/django_project/api"
-mkdir -p "$BASE/data"
-
-cat << 'INNER_EOF' > "$BASE/cli/train.py"
+# Write train script
+cat << 'INNER_EOF' > /app/environment/cli/train.py
 import argparse
 import pandas as pd
 import numpy as np
@@ -75,7 +65,8 @@ if __name__ == "__main__":
     main()
 INNER_EOF
 
-cat << 'INNER_EOF' > "$BASE/django_project/api/views.py"
+# Write Django API views
+cat << 'INNER_EOF' > /app/environment/django_project/api/views.py
 import json
 import math
 from rest_framework.decorators import api_view
@@ -84,7 +75,8 @@ import joblib
 from pathlib import Path
 import numpy as np
 
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+# Strictly /app/environment as per instruction absolute paths
+BASE_DIR = Path("/app/environment")
 MODEL_PATH = BASE_DIR / "model.joblib"
 HIST_PATH = BASE_DIR / "hist.json"
 
