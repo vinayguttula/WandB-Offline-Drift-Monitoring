@@ -129,6 +129,41 @@ def test_drift_endpoint_success(api_client, run_training):
         
     assert float(metrics["0"]) > 0.1
     assert data["is_drifted"] is True
+    
+    # Compute expected PSI from baseline hist and the test batch
+    with open(HIST_OUTPUT_PATH, 'r') as f:
+        hist_data = json.load(f)
+        
+    import numpy as np
+    import math
+    
+    for key in ["0", "1", "2", "3"]:
+        expected_counts = np.array(hist_data[key]["counts"])
+        expected_pct = expected_counts / np.sum(expected_counts)
+        bin_edges = hist_data[key]["bin_edges"]
+        
+        batch_feat = np.array([item["features"][int(key)] for item in batch])
+        actual_counts = np.zeros_like(expected_counts)
+        for j in range(len(expected_counts)):
+            if j == len(expected_counts) - 1:
+                actual_counts[j] = np.sum((batch_feat >= bin_edges[j]) & (batch_feat <= bin_edges[j+1]))
+            else:
+                actual_counts[j] = np.sum((batch_feat >= bin_edges[j]) & (batch_feat < bin_edges[j+1]))
+                
+        actual_total = np.sum(actual_counts)
+        if actual_total == 0:
+            actual_pct = np.zeros_like(actual_counts, dtype=float)
+        else:
+            actual_pct = actual_counts / actual_total
+            
+        eps = 1e-6
+        expected_pct_eps = expected_pct + eps
+        actual_pct_eps = actual_pct + eps
+        
+        psi_per_bin = (actual_pct_eps - expected_pct_eps) * np.log(actual_pct_eps / expected_pct_eps)
+        expected_psi = np.sum(psi_per_bin)
+        
+        assert abs(float(metrics[key]) - expected_psi) < 0.01, f"PSI calculation incorrect for feature {key}"
 
 def test_drift_endpoint_no_drift(api_client, run_training):
     """Verify that the /api/drift/ endpoint returns is_drifted=False when batch matches training distribution."""
@@ -147,7 +182,7 @@ def test_drift_endpoint_no_drift(api_client, run_training):
     data = response.json()
     assert "drift_metrics" in data
     for v in data["drift_metrics"].values():
-        assert float(v) < 0.1
+        assert float(v) < 0.01, f"PSI should be ~0 for same data: {v}"
         
     assert data["is_drifted"] is False
 
