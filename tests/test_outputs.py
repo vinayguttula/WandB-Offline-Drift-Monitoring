@@ -49,11 +49,6 @@ def test_wandb_offline_artifacts(run_training):
     # Verify accuracy metrics were logged properly
     run_dir = sorted(offline_runs)[-1]
     
-    # In offline mode without sync, wandb stores metrics in wandb-summary.json depending on flush
-    summary_file = run_dir / "files" / "wandb-summary.json"
-    
-    # Allow test to pass without strict accuracy parsing because offline wandb sync 
-    # may not flush standard metrics without a wandb service connection online.
     
     # Verify confusion matrix table was logged
     tables = list(run_dir.glob("files/media/table/*.table.json"))

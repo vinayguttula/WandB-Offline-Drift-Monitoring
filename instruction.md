@@ -7,6 +7,6 @@ Second, I need you to extend our API backend located in `/app/environment/django
 Make sure you validate the inputs appropriately and gracefully return standard HTTP 400 Bad Request errors if schemas or data formats are mismatched!
 
 Your solution will be assessed on its ability to faithfully integrate the offline machine learning operations and the real-time Django endpoints.
-The CLI script needs to accept three positional paths (data, model output, and histogram output) and generate equal-width feature baseline metrics. You must ensure you store the bins correctly and format the baseline JSON structure clearly.
+The CLI script needs to accept three positional paths (data, model output, and histogram output) and compute baseline feature statistics. You must format the baseline JSON structure clearly.
 
-For the Django backend endpoints, your prediction and batch drift endpoints must strictly enforce that batches have valid lengths and structures, returning standard REST HTTP 400 responses with an overarching dictionary error indicator if inputs are malformed. The returned predictions and drift metrics must use simple standardized schemas that index the calculations back to the original array features correctly.
+For the Django backend endpoints, your prediction and batch drift endpoints must return standard REST HTTP 400 responses if inputs are malformed. The returned predictions and drift metrics must compute Population Stability Index (PSI) against the saved training baseline statistics and ensure PSI calculations are numerically robust against missing or empty intervals.
