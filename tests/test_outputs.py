@@ -126,8 +126,45 @@ def test_drift_endpoint_success(api_client, run_training):
     assert "is_drifted" in data
     
     metrics = data["drift_metrics"]
+    assert len(metrics) == 4
+    for key in ["0", "1", "2", "3"]:
+        assert key in metrics
+        assert float(metrics[key]) >= 0.0
+        
     assert float(metrics["0"]) > 0.1
     assert data["is_drifted"] is True
+
+def test_drift_endpoint_no_drift(api_client, run_training):
+    """Verify that the /api/drift/ endpoint returns is_drifted=False when batch matches training distribution."""
+    batch = [
+        {"features": [-0.5, 0.2, -0.3, 0.1]},
+        {"features": [-0.4, 0.1, -0.2, 0.0]},
+        {"features": [-0.6, 0.3, -0.4, 0.2]},
+        {"features": [-0.5, 0.2, -0.3, 0.1]}
+    ] * 10
+    
+    payload = {"batch": batch}
+    response = api_client.post('/api/drift/', data=json.dumps(payload), content_type='application/json')
+    
+    assert response.status_code == 200
+    data = response.json()
+    assert "drift_metrics" in data
+    assert data["is_drifted"] is False
+    
+    for v in data["drift_metrics"].values():
+        assert float(v) < 0.1
+
+def test_drift_numerical_stability(api_client, run_training):
+    """Verify that the /api/drift/ endpoint safely handles numerical stability (zero division) in PSI calculation."""
+    batch = [{"features": [0.0, 0.0, 0.0, 0.0]}] * 20
+    response = api_client.post('/api/drift/', data=json.dumps({"batch": batch}), content_type='application/json')
+    
+    assert response.status_code == 200
+    data = response.json()
+    for v in data["drift_metrics"].values():
+        val = float(v)
+        assert val == val  # Not NaN
+        assert val != float('inf') and val != float('-inf')
 
 def test_drift_endpoint_invalid_schema(api_client, run_training):
     """Verify that the /api/drift/ endpoint safely handles invalid schema formats with HTTP 400."""
