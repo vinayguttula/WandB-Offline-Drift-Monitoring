@@ -2,7 +2,7 @@ import argparse
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.metrics import accuracy_score
 import wandb
 import joblib
 import json
