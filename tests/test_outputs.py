@@ -46,10 +46,27 @@ def test_wandb_offline_artifacts(run_training):
     offline_runs = list(wandb_dir.glob("offline-run-*"))
     assert len(offline_runs) > 0, "No offline WandB runs found"
     
+    # Verify accuracy metrics were logged properly
+    run_dir = sorted(offline_runs)[-1]
+    summary_file = run_dir / "files" / "wandb-summary.json"
+    assert summary_file.exists()
+    summary = json.loads(summary_file.read_text())
+    assert "accuracy" in summary
+    assert 0.0 <= summary["accuracy"] <= 1.0
+    
+    # Verify confusion matrix table was logged
+    tables = list(run_dir.glob("files/media/table/*.table.json"))
+    assert len(tables) > 0, "No confusion matrix table logged"
+
 def test_output_files_created(run_training):
     """Verify that the serialized model and histogram output files are created with correct schemas."""
     assert MODEL_OUTPUT_PATH.exists(), "Model output not found"
     assert HIST_OUTPUT_PATH.exists(), "Histogram output not found"
+    
+    import joblib
+    from sklearn.ensemble import RandomForestClassifier
+    model = joblib.load(MODEL_OUTPUT_PATH)
+    assert isinstance(model, RandomForestClassifier), f"Expected RandomForestClassifier, got {type(model).__name__}"
     
     with open(HIST_OUTPUT_PATH, 'r') as f:
         hist_data = json.load(f)
@@ -74,6 +91,12 @@ def test_predict_endpoint_success(api_client, run_training):
     data = response.json()
     assert "prediction" in data
     assert isinstance(data["prediction"], (int, float))
+    assert data["prediction"] in [0, 1], "Prediction must be a class label"
+    
+    import joblib
+    model = joblib.load(MODEL_OUTPUT_PATH)
+    expected = int(model.predict([payload["features"]])[0])
+    assert data["prediction"] == expected
 
 def test_predict_endpoint_invalid_schema(api_client, run_training):
     """Verify that the /api/predict/ endpoint rejects malformed input schemas with HTTP 400."""
