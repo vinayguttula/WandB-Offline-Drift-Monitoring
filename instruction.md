@@ -6,10 +6,7 @@ Second, I need you to extend our API backend located in `/app/environment/django
 
 Make sure you validate the inputs appropriately and gracefully return standard HTTP 400 Bad Request errors if schemas or data formats are mismatched!
 
-## Testing Specifications
-- The command-line utility `train.py` must accept exactly three positional arguments in the following order: `data_path`, `model_output_path`, and `hist_output_path`.
-- The baseline distribution output file must have the features keyed exactly by stringified indices (e.g., `"0"`, `"1"`, `"2"`, `"3"`).
-- Each feature distribution must have exactly 10 bins (this means the counts array has a length of 10, and the bin_edges array has a length of 11).
-- The prediction endpoint `/api/predict/` must return a prediction formatted as `{"prediction": <integer_prediction>}`. If the array has fewer than 4 features, it must return a standard dictionary of exactly `{"error": "Invalid input schema"}` alongside an HTTP 400.
-- The drift endpoint `/api/drift/` must return the `drift_metrics` dictionary explicitly using integer string keys for the feature indices (e.g., `"0"`, `"1"`).
-- The WandB run logging directory must be initiated explicitly under the standard local `wandb/` directory inside the repository environment.
+Your solution will be assessed on its ability to faithfully integrate the offline machine learning operations and the real-time Django endpoints.
+The CLI script needs to accept three positional paths (data, model output, and histogram output) and generate equal-width feature baseline metrics. You must ensure you store the bins correctly and format the baseline JSON structure clearly.
+
+For the Django backend endpoints, your prediction and batch drift endpoints must strictly enforce that batches have valid lengths and structures, returning standard REST HTTP 400 responses with an overarching dictionary error indicator if inputs are malformed. The returned predictions and drift metrics must use simple standardized schemas that index the calculations back to the original array features correctly.
