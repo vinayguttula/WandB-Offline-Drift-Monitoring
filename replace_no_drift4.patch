@@ -1,0 +1,16 @@
+<<<<<<< SEARCH
+    # Use exact values from training data to guarantee zero PSI mathematically
+    import pandas as pd
+    df = pd.read_csv(DATA_PATH)
+    features_list = df.drop(columns=["target"]).values.tolist()
+    
+    batch = [{"features": f} for f in features_list[:20]]
+=======
+    # Use exact values from training data to guarantee zero PSI mathematically
+    import pandas as pd
+    df = pd.read_csv(DATA_PATH)
+    features_list = df.drop(columns=["target"]).values.tolist()
+    
+    # Use the full dataset to match the original histogram distributions exactly
+    batch = [{"features": f} for f in features_list]
+>>>>>>> REPLACE

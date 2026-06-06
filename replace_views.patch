@@ -1,0 +1,29 @@
+<<<<<<< SEARCH
+        expected_pct = train_counts / np.sum(train_counts)
+        
+        actual_counts, _ = np.histogram(X_batch[:, i], bins=bin_edges)
+        actual_total = np.sum(actual_counts)
+        if actual_total == 0:
+            actual_pct = np.zeros_like(actual_counts, dtype=float)
+        else:
+            actual_pct = actual_counts / actual_total
+            
+        eps = 1e-6
+        expected_pct_eps = expected_pct + eps
+        actual_pct_eps = actual_pct + eps
+=======
+        expected_pct = train_counts / np.sum(train_counts)
+        
+        # Determine actual counts identically to np.histogram to match exact training bounds
+        actual_counts, _ = np.histogram(X_batch[:, i], bins=bin_edges)
+                
+        actual_total = np.sum(actual_counts)
+        if actual_total == 0:
+            actual_pct = np.zeros_like(actual_counts, dtype=float)
+        else:
+            actual_pct = actual_counts / actual_total
+            
+        eps = 1e-6
+        expected_pct_eps = expected_pct + eps
+        actual_pct_eps = actual_pct + eps
+>>>>>>> REPLACE

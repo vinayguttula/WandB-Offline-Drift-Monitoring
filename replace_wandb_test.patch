@@ -1,0 +1,34 @@
+<<<<<<< SEARCH
+    # Verify accuracy metrics were logged properly
+    run_dir = sorted(offline_runs)[-1]
+    summary_file = run_dir / "files" / "wandb-summary.json"
+    assert summary_file.exists()
+    summary = json.loads(summary_file.read_text())
+    assert "accuracy" in summary
+    assert 0.0 <= summary["accuracy"] <= 1.0
+=======
+    # Verify accuracy metrics were logged properly
+    run_dir = sorted(offline_runs)[-1]
+    
+    # In offline mode without sync, wandb stores metrics in wandb-history.jsonl or wandb-summary.json depending on flush
+    history_file = run_dir / "logs" / "wandb-history.jsonl"
+    summary_file = run_dir / "files" / "wandb-summary.json"
+    
+    found_accuracy = False
+    if summary_file.exists():
+        summary = json.loads(summary_file.read_text())
+        if "accuracy" in summary:
+            found_accuracy = True
+            assert 0.0 <= summary["accuracy"] <= 1.0
+            
+    if not found_accuracy and history_file.exists():
+        with open(history_file, 'r') as f:
+            for line in f:
+                data = json.loads(line)
+                if "accuracy" in data:
+                    found_accuracy = True
+                    assert 0.0 <= data["accuracy"] <= 1.0
+                    break
+                    
+    assert found_accuracy, "accuracy metric not found in WandB logs"
+>>>>>>> REPLACE

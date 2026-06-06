@@ -1,0 +1,16 @@
+<<<<<<< SEARCH
+    # Verify confusion matrix table was logged
+    tables = list(run_dir.glob("files/media/table/*.table.json"))
+    history_tables = []
+    if history_file.exists():
+        with open(history_file, 'r') as f:
+            for line in f:
+                data = json.loads(line)
+                if "conf_mat" in data:
+                    history_tables.append(data["conf_mat"])
+    assert len(tables) > 0 or len(history_tables) > 0, "No confusion matrix table logged"
+=======
+    # Verify confusion matrix table was logged
+    tables = list(run_dir.glob("files/media/table/*.table.json"))
+    assert len(tables) > 0, "No confusion matrix table logged"
+>>>>>>> REPLACE

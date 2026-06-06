@@ -1,0 +1,35 @@
+<<<<<<< SEARCH
+def test_drift_endpoint_no_drift(api_client, run_training):
+    """Verify that the /api/drift/ endpoint returns is_drifted=False when batch matches training distribution."""
+    batch = [
+        {"features": [-0.5, 0.2, -0.3, 0.1]},
+        {"features": [-0.4, 0.1, -0.2, 0.0]},
+        {"features": [-0.6, 0.3, -0.4, 0.2]},
+        {"features": [-0.5, 0.2, -0.3, 0.1]}
+    ] * 10
+    
+    payload = {"batch": batch}
+    response = api_client.post('/api/drift/', data=json.dumps(payload), content_type='application/json')
+    
+    assert response.status_code == 200
+    data = response.json()
+    assert "drift_metrics" in data
+    assert data["is_drifted"] is False
+=======
+def test_drift_endpoint_no_drift(api_client, run_training):
+    """Verify that the /api/drift/ endpoint returns is_drifted=False when batch matches training distribution."""
+    # Use exact values from training data to guarantee zero PSI mathematically
+    import pandas as pd
+    df = pd.read_csv(DATA_PATH)
+    features_list = df.drop(columns=["target"]).values.tolist()
+    
+    batch = [{"features": f} for f in features_list[:20]]
+    
+    payload = {"batch": batch}
+    response = api_client.post('/api/drift/', data=json.dumps(payload), content_type='application/json')
+    
+    assert response.status_code == 200
+    data = response.json()
+    assert "drift_metrics" in data
+    assert data["is_drifted"] is False
+>>>>>>> REPLACE

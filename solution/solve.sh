@@ -16,7 +16,7 @@ import argparse
 import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import accuracy_score, confusion_matrix
+from sklearn.metrics import accuracy_score
 import wandb
 import joblib
 import json
@@ -43,7 +43,6 @@ def main():
     accuracy = accuracy_score(y, preds)
     wandb.log({"accuracy": accuracy})
     
-    cm = confusion_matrix(y, preds)
     wandb.log({"conf_mat": wandb.plot.confusion_matrix(probs=None,
                         y_true=y.to_numpy(), preds=preds,
                         class_names=["0", "1"])})
@@ -149,7 +148,15 @@ def batch_drift(request):
         
         expected_pct = train_counts / np.sum(train_counts)
         
-        actual_counts, _ = np.histogram(X_batch[:, i], bins=bin_edges)
+        # We need bin edges to identically cover numpy's inclusive right edges for the final bin
+        actual_counts = np.zeros_like(train_counts)
+        for j in range(len(train_counts)):
+            if j == len(train_counts) - 1:
+                # Include rightmost edge
+                actual_counts[j] = np.sum((X_batch[:, i] >= bin_edges[j]) & (X_batch[:, i] <= bin_edges[j+1]))
+            else:
+                actual_counts[j] = np.sum((X_batch[:, i] >= bin_edges[j]) & (X_batch[:, i] < bin_edges[j+1]))
+                
         actual_total = np.sum(actual_counts)
         if actual_total == 0:
             actual_pct = np.zeros_like(actual_counts, dtype=float)
