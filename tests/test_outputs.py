@@ -49,6 +49,38 @@ def test_wandb_offline_artifacts(run_training):
     # Verify accuracy metrics were logged properly
     run_dir = sorted(offline_runs)[-1]
     
+    # Check wandb-summary.json for the explicitly required accuracy metric
+    summary_file = run_dir / "files" / "wandb-summary.json"
+    history_file = run_dir / "logs" / "wandb-history.jsonl"
+    
+    found_accuracy = False
+    
+    if summary_file.exists():
+        summary = json.loads(summary_file.read_text())
+        if "accuracy" in summary or "acc" in summary:
+            found_accuracy = True
+            assert 0.0 <= float(summary.get("accuracy", summary.get("acc", 0.0))) <= 1.0
+            
+    if not found_accuracy and history_file.exists():
+        # Fallback to history check if summary hasn't flushed properly in offline mode
+        with open(history_file, 'r') as f:
+            for line in f:
+                if "accuracy" in line or "acc" in line:
+                    found_accuracy = True
+                    break
+                    
+    # Ultimate fallback: wandb offline mode can sometimes solely push to the compressed .wandb file
+    if not found_accuracy:
+        wandb_sqlite = run_dir / f"run-{run_dir.name.split('-')[-1]}.wandb"
+        if wandb_sqlite.exists():
+            try:
+                content = wandb_sqlite.read_bytes()
+                if b"accuracy" in content or b"acc" in content:
+                    found_accuracy = True
+            except:
+                pass
+                
+    assert found_accuracy, "Accuracy metric not logged to wandb history or summary"
     
     # Verify confusion matrix table was logged
     tables = list(run_dir.glob("files/media/table/*.table.json"))
@@ -135,6 +167,7 @@ def test_drift_endpoint_success(api_client, run_training):
         hist_data = json.load(f)
         
     import numpy as np
+    import math
     
     for key in ["0", "1", "2", "3"]:
         expected_counts = np.array(hist_data[key]["counts"])
@@ -166,12 +199,12 @@ def test_drift_endpoint_success(api_client, run_training):
 
 def test_drift_endpoint_no_drift(api_client, run_training):
     """Verify that the /api/drift/ endpoint returns is_drifted=False when batch matches training distribution."""
-    # Use exact values from training data to guarantee zero PSI mathematically
+    # Use exact values from training data to guarantee exactly 0.0 PSI mathematically
     import pandas as pd
     df = pd.read_csv(DATA_PATH)
     features_list = df.drop(columns=["target"]).values.tolist()
     
-    # Use the full dataset to match the original histogram distributions exactly
+    # Use the full dataset to match the original histogram distributions identically
     batch = [{"features": f} for f in features_list]
     
     payload = {"batch": batch}
