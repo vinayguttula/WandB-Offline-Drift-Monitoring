@@ -135,7 +135,6 @@ def test_drift_endpoint_success(api_client, run_training):
         hist_data = json.load(f)
         
     import numpy as np
-    import math
     
     for key in ["0", "1", "2", "3"]:
         expected_counts = np.array(hist_data[key]["counts"])
