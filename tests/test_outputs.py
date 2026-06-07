@@ -213,10 +213,13 @@ def test_drift_endpoint_no_drift(api_client, run_training):
     assert response.status_code == 200
     data = response.json()
     assert "drift_metrics" in data
-    for v in data["drift_metrics"].values():
+    for key, v in data["drift_metrics"].items():
         assert float(v) < 0.01, f"PSI should be ~0 for same data: {v}"
         
     assert data["is_drifted"] is False
+    
+    # Explicitly calculate expected hardcoded value (which should be epsilon derived effectively 0.0)
+    assert abs(float(data["drift_metrics"]["0"]) - 0.0) < 0.01, "Expected PSI for identical distributions must be ~0.0"
 
 def test_drift_numerical_stability(api_client, run_training):
     """Verify that the /api/drift/ endpoint safely handles numerical stability (zero division) in PSI calculation."""
