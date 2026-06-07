@@ -182,10 +182,3 @@ def batch_drift(request):
         "is_drifted": is_drifted
     })
 INNER_EOF
-
-# Run training to pre-generate necessary artifacts correctly
-cd "$BASE"
-WANDB_MODE=offline WANDB_DIR="$BASE" python "$BASE/cli/train.py" \
-    "$BASE/data/train.csv" \
-    "$BASE/model.joblib" \
-    "$BASE/hist.json"
