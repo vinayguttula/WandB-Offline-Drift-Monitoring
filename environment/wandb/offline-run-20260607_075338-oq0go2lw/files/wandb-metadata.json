@@ -1,0 +1,64 @@
+{
+    "os": "Linux-6.8.0-x86_64-with-glibc2.39",
+    "python": "3.12.13",
+    "heartbeatAt": "2026-06-07T07:53:38.989274",
+    "startedAt": "2026-06-07T07:53:38.906507",
+    "docker": null,
+    "cuda": null,
+    "args": [
+        "/app/solution/../environment/data/train.csv",
+        "/app/solution/../environment/model.joblib",
+        "/app/solution/../environment/hist.json"
+    ],
+    "state": "running",
+    "program": "/app/solution/../environment/cli/train.py",
+    "codePathLocal": "cli/train.py",
+    "codePath": "environment/cli/train.py",
+    "git": {
+        "remote": "https://vinayguttula:@github.com/vinayguttula/WandB-Offline-Drift-Monitoring.git",
+        "commit": "23fdfe7bcd71fd4636b92ecf73258ed5a31c668e"
+    },
+    "email": "161369871+google-labs-jules[bot]@users.noreply.github.com",
+    "root": "/app",
+    "host": "devbox",
+    "username": "jules",
+    "executable": "/home/jules/.pyenv/versions/3.12.13/bin/python",
+    "cpu_count": 4,
+    "cpu_count_logical": 4,
+    "cpu_freq": {
+        "current": 2299.998,
+        "min": 0.0,
+        "max": 0.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2299.998,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2299.998,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2299.998,
+            "min": 0.0,
+            "max": 0.0
+        },
+        {
+            "current": 2299.998,
+            "min": 0.0,
+            "max": 0.0
+        }
+    ],
+    "disk": {
+        "/": {
+            "total": 97.87200164794922,
+            "used": 0.6983566284179688
+        }
+    },
+    "memory": {
+        "total": 7.772556304931641
+    }
+}
