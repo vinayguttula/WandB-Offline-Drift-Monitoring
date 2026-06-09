@@ -77,7 +77,7 @@ def test_wandb_offline_artifacts(run_training):
                 content = wandb_sqlite.read_bytes()
                 if b"accuracy" in content or b"acc" in content:
                     found_accuracy = True
-            except:
+            except Exception:
                 pass
                 
     assert found_accuracy, "Accuracy metric not logged to wandb history or summary"
@@ -167,7 +167,6 @@ def test_drift_endpoint_success(api_client, run_training):
         hist_data = json.load(f)
         
     import numpy as np
-    import math
     
     for key in ["0", "1", "2", "3"]:
         expected_counts = np.array(hist_data[key]["counts"])
